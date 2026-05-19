@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>毕业照动态邀请函 Demo</title>
+  <style>
+    :root {
+      --bg: #09070d;
+      --paper: #fff7e6;
+      --gold: #d9a84f;
+      --gold-soft: #f7dc9b;
+      --wine: #641a24;
+      --ink: #3a2416;
+      --muted: #9c7a50;
+      --shadow: rgba(0, 0, 0, 0.42);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      color: var(--paper);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(217, 168, 79, 0.2), transparent 24rem),
+        radial-gradient(circle at 85% 18%, rgba(126, 30, 41, 0.45), transparent 28rem),
+        linear-gradient(135deg, #050308 0%, #17101e 42%, #33121d 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .scene {
+      position: relative;
+      display: grid;
+      min-height: 100vh;
+      padding: 32px 16px;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .scene::before,
+    .scene::after {
+      position: fixed;
+      inset: -18vmax;
+      z-index: -3;
+      content: "";
+      background-image:
+        radial-gradient(circle, rgba(247, 220, 155, 0.55) 0 1px, transparent 2px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.25) 0 1px, transparent 2px);
+      background-position: 0 0, 36px 44px;
+      background-size: 96px 96px, 140px 140px;
+      animation: starDrift 18s linear infinite;
+    }
+
+    .scene::after {
+      opacity: 0.42;
+      filter: blur(1px);
+      animation-duration: 28s;
+      animation-direction: reverse;
+    }
+
+    .halo {
+      position: fixed;
+      inset: auto auto 8vh 50%;
+      z-index: -2;
+      width: min(68vw, 620px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(217, 168, 79, 0.25), transparent 66%);
+      filter: blur(8px);
+      transform: translateX(-50%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    .invitation {
+      width: min(94vw, 430px);
+      perspective: 1500px;
+    }
+
+    .intro {
+      margin-bottom: 18px;
+      text-align: center;
+      animation: fadeDown 1s ease both;
+    }
+
+    .intro .eyebrow {
+      margin: 0 0 8px;
+      color: var(--gold-soft);
+      font-size: 12px;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+    }
+
+    .intro h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(34px, 9vw, 54px);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .envelope {
+      position: relative;
+      min-height: 620px;
+      transform-style: preserve-3d;
+    }
+
+    .card,
+    .cover {
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      box-shadow: 0 30px 80px var(--shadow);
+    }
+
+    .cover {
+      z-index: 3;
+      display: grid;
+      padding: 28px;
+      overflow: hidden;
+      cursor: pointer;
+      place-items: center;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.07), transparent 28%),
+        linear-gradient(135deg, #651824 0%, #9b2534 46%, #4b111b 100%);
+      border: 1px solid rgba(247, 220, 155, 0.38);
+      transform-origin: left center;
+      transition:
+        transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.55s ease 0.44s,
+        visibility 0.55s ease 0.44s;
+    }
+
+    .cover::before,
+    .cover::after {
+      position: absolute;
+      content: "";
+      inset: 18px;
+      pointer-events: none;
+      border: 1px solid rgba(247, 220, 155, 0.42);
+      border-radius: 22px;
+    }
+
+    .cover::after {
+      inset: 34px;
+      border-style: dashed;
+      opacity: 0.6;
+    }
+
+    .wax {
+      position: relative;
+      display: grid;
+      width: 144px;
+      aspect-ratio: 1;
+      place-items: center;
+      border-radius: 50%;
+      color: #ffe8aa;
+      background:
+        radial-gradient(circle at 32% 25%, #c94958, transparent 18%),
+        radial-gradient(circle, #7a1422 0 56%, #4a0d16 58% 100%);
+      box-shadow:
+        inset 0 8px 24px rgba(255, 255, 255, 0.14),
+        inset 0 -12px 20px rgba(0, 0, 0, 0.24),
+        0 18px 40px rgba(0, 0, 0, 0.35);
+      animation: sealFloat 2.8s ease-in-out infinite;
+    }
+
+    .wax span {
+      display: grid;
+      width: 92px;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(255, 232, 170, 0.58);
+      border-radius: 50%;
+      font-family: Georgia, serif;
+      font-size: 38px;
+      letter-spacing: 0.04em;
+    }
+
+    .cover-tip {
+      position: absolute;
+      bottom: 66px;
+      left: 50%;
+      color: rgba(255, 247, 230, 0.86);
+      font-size: 14px;
+      letter-spacing: 0.28em;
+      transform: translateX(-50%);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+
+    .opened .cover {
+      visibility: hidden;
+      opacity: 0;
+      transform: rotateY(-108deg) translateX(-16px);
+    }
+
+    .card {
+      z-index: 1;
+      padding: 28px 24px;
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.72), transparent 34%),
+        repeating-linear-gradient(90deg, rgba(217, 168, 79, 0.06) 0 1px, transparent 1px 10px),
+        var(--paper);
+      border: 1px solid rgba(217, 168, 79, 0.52);
+      transform: translateY(16px) scale(0.97);
+      transition: transform 0.8s ease;
+    }
+
+    .opened .card {
+      transform: translateY(0) scale(1);
+    }
+
+    .card::before {
+      position: absolute;
+      inset: 14px;
+      content: "";
+      pointer-events: none;
+      border: 1px solid rgba(217, 168, 79, 0.6);
+      border-radius: 22px;
+    }
+
+    .corner {
+      position: absolute;
+      width: 96px;
+      aspect-ratio: 1;
+      border: solid var(--gold);
+      opacity: 0.72;
+    }
+
+    .corner.top-left {
+      top: 20px;
+      left: 20px;
+      border-width: 2px 0 0 2px;
+      border-radius: 20px 0 0;
+    }
+
+    .corner.bottom-right {
+      right: 20px;
+      bottom: 20px;
+      border-width: 0 2px 2px 0;
+      border-radius: 0 0 20px;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      height: 100%;
+      gap: 18px;
+      align-content: start;
+      text-align: center;
+    }
+
+    .tag {
+      justify-self: center;
+      padding: 8px 16px;
+      border: 1px solid rgba(217, 168, 79, 0.62);
+      border-radius: 999px;
+      color: var(--wine);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .title {
+      margin: 0;
+      color: #5b1b18;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 42px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+    }
+
+    .subtitle {
+      margin: -8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.24em;
+    }
+
+    .message {
+      margin: 0 auto;
+      max-width: 310px;
+      color: #5d402a;
+      font-size: 15px;
+      line-height: 1.9;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--gold);
+    }
+
+    .divider::before,
+    .divider::after {
+      flex: 1;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, transparent, currentColor, transparent);
+    }
+
+    .details {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.42);
+      border: 1px solid rgba(217, 168, 79, 0.28);
+      text-align: left;
+    }
+
+    .detail {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 14px;
+      align-items: start;
+      font-size: 14px;
+    }
+
+    .detail strong {
+      color: var(--wine);
+      letter-spacing: 0.12em;
+    }
+
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .timebox {
+      padding: 10px 4px;
+      border-radius: 14px;
+      color: var(--wine);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(217, 168, 79, 0.12));
+      box-shadow: inset 0 0 0 1px rgba(217, 168, 79, 0.25);
+    }
+
+    .timebox b {
+      display: block;
+      font-family: Georgia, serif;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .timebox span {
+      color: #8a6946;
+      font-size: 11px;
+    }
+
+    .petal {
+      position: fixed;
+      top: -20px;
+      z-index: -1;
+      width: 8px;
+      height: 18px;
+      border-radius: 999px;
+      opacity: 0.78;
+      background: linear-gradient(#fff1ba, #d9a84f);
+      animation: fall linear forwards;
+    }
+
+    @media (max-width: 420px) {
+      .scene {
+        padding: 22px 10px;
+      }
+
+      .envelope {
+        min-height: 640px;
+      }
+
+      .card {
+        padding: 24px 18px;
+      }
+
+      .title {
+        font-size: 36px;
+      }
+    }
+
+    @keyframes starDrift {
+      to {
+        transform: translate3d(-96px, 96px, 0);
+      }
+    }
+
+    @keyframes pulse {
+      50% {
+        transform: translateX(-50%) scale(1.08);
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-18px);
+      }
+    }
+
+    @keyframes sealFloat {
+      50% {
+        transform: translateY(-8px) scale(1.03);
+      }
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.45;
+      }
+    }
+
+    @keyframes fall {
+      to {
+        transform: translate3d(var(--dx), 110vh, 0) rotate(540deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene">
+    <div class="halo"></div>
+
+    <section class="invitation" aria-label="动态邀请函">
+      <header class="intro">
+        <p class="eyebrow">Graduation Photo Invitation</p>
+        <h1>INVITATION</h1>
+      </header>
+
+      <div class="envelope" id="envelope">
+        <div class="cover" id="cover" role="button" tabindex="0" aria-label="开启邀请函">
+          <div class="wax" aria-hidden="true"><span>点击</span></div>
+          <div class="cover-tip">点击开启</div>
+        </div>
+
+        <article class="card">
+          <span class="corner top-left" aria-hidden="true"></span>
+          <span class="corner bottom-right" aria-hidden="true"></span>
+
+          <div class="card-content">
+            <div class="tag">诚挚邀请 · 一起拍毕业照</div>
+            <h2 class="title">青春留影</h2>
+            <p class="subtitle">留下属于我们的青春记忆</p>
+
+            <p class="message">
+              毕业的钟声越来越近，想邀请你一起来拍一组毕业照。
+              在镜头里定格笑容、校园和并肩走过的日子。
+            </p>
+
+            <div class="divider" aria-hidden="true">✦</div>
+
+            <div class="details">
+              <div class="detail">
+                <strong>时间</strong>
+                <span>2026 年 05 月 21 日 15:30</span>
+              </div>
+              <div class="detail">
+                <strong>地点</strong>
+                <span>山东大学 · 知新楼广场</span>
+              </div>
+              <div class="detail">
+                <strong>主题</strong>
+                <span>留下属于我们的青春记忆</span>
+              </div>
+            </div>
+
+            <div class="countdown" aria-label="活动倒计时">
+              <div class="timebox"><b id="days">00</b><span>天</span></div>
+              <div class="timebox"><b id="hours">00</b><span>时</span></div>
+              <div class="timebox"><b id="minutes">00</b><span>分</span></div>
+              <div class="timebox"><b id="seconds">00</b><span>秒</span></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const envelope = document.querySelector("#envelope");
+    const cover = document.querySelector("#cover");
+    const targetDate = new Date("2026-05-21T15:30:00+08:00").getTime();
+
+    function openInvitation() {
+      envelope.classList.add("opened");
+    }
+
+    cover.addEventListener("click", openInvitation);
+    cover.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openInvitation();
+      }
+    });
+
+    function updateCountdown() {
+      const distance = Math.max(targetDate - Date.now(), 0);
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((distance / (1000 * 60)) % 60);
+      const seconds = Math.floor((distance / 1000) % 60);
+
+      document.querySelector("#days").textContent = String(days).padStart(2, "0");
+      document.querySelector("#hours").textContent = String(hours).padStart(2, "0");
+      document.querySelector("#minutes").textContent = String(minutes).padStart(2, "0");
+      document.querySelector("#seconds").textContent = String(seconds).padStart(2, "0");
+    }
+
+    function createPetal() {
+      const petal = document.createElement("span");
+      petal.className = "petal";
+      petal.style.left = `${Math.random() * 100}vw`;
+      petal.style.setProperty("--dx", `${(Math.random() - 0.5) * 160}px`);
+      petal.style.animationDuration = `${6 + Math.random() * 6}s`;
+      petal.style.animationDelay = `${Math.random() * 0.8}s`;
+      document.body.appendChild(petal);
+
+      window.setTimeout(() => petal.remove(), 13000);
+    }
+
+    updateCountdown();
+    window.setInterval(updateCountdown, 1000);
+    window.setInterval(createPetal, 420);
+  </script>
+</body>
+</html>
